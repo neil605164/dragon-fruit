@@ -1,0 +1,13 @@
+img_path:
+  img_path_rotate: /app/images/dragon-fruit/rotate
+
+img_server:
+  img_server_rotate: http://images.sh56789.com/dragon-fruit/rotate/
+
+log:
+  log_dir: /app/log/
+  access_log: goformat_access.log
+  error_log: goformat_error.log
+
+db:
+  debug: true
