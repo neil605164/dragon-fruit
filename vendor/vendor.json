@@ -117,6 +117,12 @@
 			"revisionTime": "2018-10-26T00:15:55Z"
 		},
 		{
+			"checksumSHA1": "ajAqUByI39Sfm99F/ZNOguPP3Mk=",
+			"path": "github.com/gorilla/websocket",
+			"revision": "c3e18be99d19e6b3e8f1559eea2c161a665c4b6b",
+			"revisionTime": "2019-08-25T01:20:11Z"
+		},
+		{
 			"checksumSHA1": "yB8jwrSDDG/i2WYcgoRthfGdZ7k=",
 			"path": "github.com/graphql-go/graphql",
 			"revision": "199d20bbfed70dae8c7d4619d4e0d339ce738b43",

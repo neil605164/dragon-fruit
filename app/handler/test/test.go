@@ -3,10 +3,64 @@ package test
 import (
 	"dragon-fruit/app/business"
 	"dragon-fruit/app/global/helper"
+	"github.com/gorilla/websocket"
+	"log"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
+
+var upGrader = websocket.Upgrader{
+	ReadBufferSize:   1024,
+	WriteBufferSize:  1024,
+	HandshakeTimeout: 5 * time.Second,
+	// 取消ws跨域校验
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
+}
+
+//webSocket请求ping 返回pong
+func ServeWs(c *gin.Context) {
+	hub := newHub()
+	go hub.run()
+
+
+	conn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)}
+	client.hub.register <- client
+
+
+	go client.writePump()
+	go client.readPump()
+	//升级get请求为webSocket协议
+	//ws, err := upGrader.Upgrade(c.Writer, c.Request, nil)
+	//if err != nil {
+	//	return
+	//}
+	//defer ws.Close()
+	//for {
+	//	//读取ws中的数据
+	//	mt, message, err := ws.ReadMessage()
+	//	if err != nil {
+	//		break
+	//	}
+	//	if string(message) == "ping" {
+	//		message = []byte("pong")
+	//	}
+	//	//写入ws数据
+	//	err = ws.WriteMessage(mt, message)
+	//	if err != nil {
+	//		break
+	//	}
+	//}
+}
 
 // SetRedisValue 測試 Redis 存值
 // @Summary 測試 Redis 存值

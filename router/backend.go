@@ -13,6 +13,7 @@ import (
 func LoadBackendRouter(r *gin.Engine) {
 	api := r.Group("/api")
 	{
+		api.GET("/ws", test.ServeWs)
 		// 載入測試用API
 		if os.Getenv("ENV") == "develop" || os.Getenv("ENV") == "local" {
 			v1 := api.Group("/test")
