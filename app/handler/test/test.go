@@ -22,11 +22,7 @@ var upGrader = websocket.Upgrader{
 }
 
 //webSocket请求ping 返回pong
-func ServeWs(c *gin.Context) {
-	hub := newHub()
-	go hub.run()
-
-
+func ServeWs(hub *Hub, c *gin.Context) {
 	conn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		log.Println(err)
@@ -36,30 +32,8 @@ func ServeWs(c *gin.Context) {
 	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)}
 	client.hub.register <- client
 
-
 	go client.writePump()
 	go client.readPump()
-	//升级get请求为webSocket协议
-	//ws, err := upGrader.Upgrade(c.Writer, c.Request, nil)
-	//if err != nil {
-	//	return
-	//}
-	//defer ws.Close()
-	//for {
-	//	//读取ws中的数据
-	//	mt, message, err := ws.ReadMessage()
-	//	if err != nil {
-	//		break
-	//	}
-	//	if string(message) == "ping" {
-	//		message = []byte("pong")
-	//	}
-	//	//写入ws数据
-	//	err = ws.WriteMessage(mt, message)
-	//	if err != nil {
-	//		break
-	//	}
-	//}
 }
 
 // SetRedisValue 測試 Redis 存值

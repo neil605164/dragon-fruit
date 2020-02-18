@@ -3,6 +3,7 @@ package main
 import (
 	"dragon-fruit/app/global"
 	"dragon-fruit/app/global/helper"
+	"dragon-fruit/app/handler/test"
 	"dragon-fruit/app/model"
 	"dragon-fruit/app/repository"
 	"dragon-fruit/app/task"
@@ -86,6 +87,13 @@ func runHTTP() {
 
 	// 背景
 	go task.Schedule()
+
+	// New WebSocket
+	hub := test.NewHub()
+	go hub.Run()
+	r.GET("/api/ws", func(c *gin.Context) {
+		test.ServeWs(hub, c)
+	})
 
 	// 載入router設定
 	router.RouteProvider(r)
