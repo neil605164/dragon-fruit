@@ -1,0 +1,17 @@
+master:
+  # master db 設定
+  host: dragon-fruitDB
+  username: root
+  password: root
+  database: dragon-fruit
+
+slave:
+  # slave db 設定
+  host: dragon-fruitDB
+  username: root
+  password: root
+  database: dragon-fruit
+redis:
+  redis_host: redis_dragon-fruit
+  redis_port: 6379
+  redis_password: rd3Redis
