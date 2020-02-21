@@ -4,10 +4,10 @@ import (
 	"dragon-fruit/app/global"
 	"dragon-fruit/app/global/errorcode"
 	"dragon-fruit/app/global/helper"
-	"dragon-fruit/app/model"
 	"fmt"
 	"log"
 	"sync"
+	"time"
 
 	"github.com/gomodule/redigo/redis"
 )
@@ -17,6 +17,53 @@ type Redis struct{}
 
 var redisSingleton *Redis
 var redisOnce sync.Once
+
+// redisPool 存放redis連線池的全域變數
+var redisPool *redis.Pool
+
+func init() {
+	redisPool = &redis.Pool{
+		MaxIdle:     100,              // int 最大可允許的閒置連線數
+		MaxActive:   10000,            // int 最大建立的連線數，默認為0不限制(reids 預設最大連線量)
+		IdleTimeout: 20 * time.Second, // 連線過期時間，默認為0表示不做過期限制
+		Wait:        true,             // 當連線超出限制數量後，是否等待到空閒連線釋放
+		Dial: func() (c redis.Conn, err error) {
+			// 使用redis封裝的Dial進行tcp連接
+			host := global.Config.Redis.RedisHost
+			port := global.Config.Redis.RedisPort
+			pwd := global.Config.Redis.RedisPwd
+
+			// 組合連接資訊
+			var connectionString = fmt.Sprintf("%s:%s", host, port)
+			c, err = redis.Dial(
+				"tcp",
+				connectionString,
+				redis.DialPassword(pwd),
+			)
+
+			if err != nil {
+				helper.ErrorHandle(global.WarnLog, 1001012, err.Error())
+				return
+			}
+			return
+		}, // 連接redis的函数
+		TestOnBorrow: func(redis redis.Conn, t time.Time) (err error) {
+			// 每5秒ping一次redis
+			if time.Since(t) < (5 * time.Second) {
+				return
+			}
+			_, err = redis.Do("PING")
+			if err != nil {
+				helper.ErrorHandle(global.WarnLog, 1001019, err.Error())
+				return
+			}
+
+			return
+		}, // 定期對 redis server 做 ping/pong 測試
+
+	}
+
+}
 
 // RedisIns 獲得單例對象
 func RedisIns() *Redis {
@@ -28,7 +75,6 @@ func RedisIns() *Redis {
 
 // RedisPing 檢查Redis是否啟動
 func RedisPing() {
-	redisPool := model.RedisPoolConnect()
 	conn := redisPool.Get()
 	defer conn.Close()
 
@@ -40,7 +86,6 @@ func RedisPing() {
 
 // Exists 檢查key是否存在
 func (rConn *Redis) Exists(key string) (ok bool, apiErr errorcode.Error) {
-	redisPool := model.RedisPoolConnect()
 	conn := redisPool.Get()
 	defer conn.Close()
 
@@ -57,7 +102,6 @@ func (rConn *Redis) Exists(key string) (ok bool, apiErr errorcode.Error) {
 
 // Set 存入redis值
 func (rConn *Redis) Set(key string, value interface{}, expiretime int) (apiErr errorcode.Error) {
-	redisPool := model.RedisPoolConnect()
 	conn := redisPool.Get()
 	defer conn.Close()
 
@@ -72,7 +116,6 @@ func (rConn *Redis) Set(key string, value interface{}, expiretime int) (apiErr e
 // Get 取出redis值
 func (rConn *Redis) Get(key string) (value string, apiErr errorcode.Error) {
 
-	redisPool := model.RedisPoolConnect()
 	conn := redisPool.Get()
 	defer conn.Close()
 
@@ -86,7 +129,6 @@ func (rConn *Redis) Get(key string) (value string, apiErr errorcode.Error) {
 
 // Delete 刪除redis值
 func (rConn *Redis) Delete(key string) (apiErr errorcode.Error) {
-	redisPool := model.RedisPoolConnect()
 	conn := redisPool.Get()
 	defer conn.Close()
 
@@ -101,7 +143,6 @@ func (rConn *Redis) Delete(key string) (apiErr errorcode.Error) {
 
 // Append 在相同key新增多個值
 func (rConn *Redis) Append(key string, value interface{}) (n interface{}, apiErr errorcode.Error) {
-	redisPool := model.RedisPoolConnect()
 	conn := redisPool.Get()
 	defer conn.Close()
 
@@ -117,7 +158,6 @@ func (rConn *Redis) Append(key string, value interface{}) (n interface{}, apiErr
 
 // HashSet Hash方式存入redis值
 func (rConn *Redis) HashSet(hkey string, key interface{}, value interface{}, time int) (apiErr errorcode.Error) {
-	redisPool := model.RedisPoolConnect()
 	conn := redisPool.Get()
 	defer conn.Close()
 
@@ -140,7 +180,6 @@ func (rConn *Redis) HashSet(hkey string, key interface{}, value interface{}, tim
 
 // HashGet Hash方式取出redis值
 func (rConn *Redis) HashGet(hkey string, field interface{}) (value string, apiErr errorcode.Error) {
-	redisPool := model.RedisPoolConnect()
 	conn := redisPool.Get()
 	defer conn.Close()
 
@@ -154,17 +193,44 @@ func (rConn *Redis) HashGet(hkey string, field interface{}) (value string, apiEr
 }
 
 // Publish redis pub
-func (rConn *Redis) Publish() (apiErr errorcode.Error) {
-	redisPool := model.RedisPoolConnect()
-	fmt.Println("Publish Redis Pool redisPool Access", redisPool)
+func (rConn *Redis) Publish(key string, value string) (reply int, apiErr errorcode.Error) {
+	var err error
+
+	conn := redisPool.Get()
+	defer conn.Close()
+
+	reply, err = redis.Int(conn.Do("PUBLISH", key, value))
+	if err != nil {
+		helper.ErrorHandle(global.WarnLog, 1003001, err.Error())
+		return
+	}
 
 	return
 }
 
 // Subscribe redis sub
-func (rConn *Redis) Subscribe() (apiErr errorcode.Error) {
-	redisPool := model.RedisPoolConnect()
-	fmt.Println("Subscribe Redis Pool redisPool Access", redisPool)
+func (rConn *Redis) Subscribe(channel string, msg chan []byte) {
 
-	return
+	conn := redisPool.Get()
+	defer conn.Close()
+
+	psc := redis.PubSubConn{Conn: conn}
+	if err := psc.PSubscribe(channel); err != nil {
+		fmt.Println("########", err)
+	}
+
+	for conn.Err() == nil {
+		// fmt.Println("Subscribe Redis Conn ====>", conn)
+		switch v := psc.Receive().(type) {
+		case redis.Message:
+			fmt.Printf("========>%s: message: %s\n", v.Channel, v.Data)
+			msg <- v.Data
+		case redis.Subscription:
+			fmt.Printf("--------->%s: %s %d\n", v.Channel, v.Kind, v.Count)
+		case error:
+			fmt.Println("~~~~~Error", conn.Err())
+		}
+
+	}
+
 }

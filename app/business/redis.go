@@ -1,12 +1,11 @@
 package business
 
 import (
-	"dragon-fruit/app/global"
 	"dragon-fruit/app/global/errorcode"
 	"dragon-fruit/app/repository"
 	"fmt"
+	"log"
 	"sync"
-	"time"
 )
 
 // RedisBus 管理者Business
@@ -24,43 +23,32 @@ func RedisIns() *RedisBus {
 	return redisSingleton
 }
 
-// SetRedisKey 存值進入redis
-func (a *RedisBus) SetRedisKey() (err errorcode.Error) {
-	redis := repository.RedisIns()
-	key := fmt.Sprintf("dragon-fruit:TestRedis")
-	err = redis.Set(key, time.Now(), global.RedisDBExpire)
-	if err != nil {
-		return
-	}
-
-	return
-}
-
-// GetRedisValue 取 redis 值
-func (a *RedisBus) GetRedisValue() (value string, err errorcode.Error) {
-
-	redis := repository.RedisIns()
-	key := fmt.Sprintf("dragon-fruit:TestRedis")
-	value, err = redis.Get(key)
-	if err != nil {
-		return
-	}
-
-	return
-}
-
 // RedisPub redis pub
 func (a *RedisBus) RedisPub() (apiErr errorcode.Error) {
 	repo := repository.RedisIns()
-	repo.Publish()
+
+	_, err := repo.Publish("test/foo", "barsss")
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	return
 }
 
 // RedisSub redis sub
-func (a *RedisBus) RedisSub() (apiErr errorcode.Error) {
+func (a *RedisBus) RedisSub() {
 	repo := repository.RedisIns()
-	repo.Subscribe()
 
-	return
+	channel := fmt.Sprintf("test/foo")
+
+	reply := make(chan []byte)
+	repo.Subscribe(channel, reply)
+
+	fmt.Println("=============================================###")
+
+	msg := <-reply
+
+	fmt.Println("Msgggggg", string(msg))
+	fmt.Printf("++++++++++++++recieved %q", string(msg))
+
 }
