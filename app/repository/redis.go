@@ -212,15 +212,18 @@ func (rConn *Redis) Publish(key string, value string) (reply int, apiErr errorco
 func (rConn *Redis) Subscribe(channel string, msg chan []byte) {
 
 	conn := redisPool.Get()
-	defer conn.Close()
+	// defer conn.Close()
 
 	psc := redis.PubSubConn{Conn: conn}
+
 	if err := psc.PSubscribe(channel); err != nil {
-		fmt.Println("########", err)
+		fmt.Println("Subscribe Error ====>", err.Error())
 	}
 
-	for conn.Err() == nil {
-		// fmt.Println("Subscribe Redis Conn ====>", conn)
+	// Start a goroutine to receive notifications from the server.
+	// go func(conn redis.Conn) {
+	defer conn.Close()
+	for {
 		switch v := psc.Receive().(type) {
 		case redis.Message:
 			fmt.Printf("========>%s: message: %s\n", v.Channel, v.Data)
@@ -229,8 +232,39 @@ func (rConn *Redis) Subscribe(channel string, msg chan []byte) {
 			fmt.Printf("--------->%s: %s %d\n", v.Channel, v.Kind, v.Count)
 		case error:
 			fmt.Println("~~~~~Error", conn.Err())
+			time.Sleep(time.Second * 10)
 		}
-
 	}
+	// }(conn)
+
+}
+
+func Subscribe2() {
+
+	conn := redisPool.Get()
+	// defer conn.Close()
+
+	psc := redis.PubSubConn{Conn: conn}
+
+	if err := psc.PSubscribe("test/foo"); err != nil {
+		fmt.Println("Subscribe Error ====>", err.Error())
+	}
+
+	// Start a goroutine to receive notifications from the server.
+	// go func(conn redis.Conn) {
+	defer conn.Close()
+	for {
+		switch v := psc.Receive().(type) {
+		case redis.Message:
+			fmt.Printf("========>%s: message: %s\n", v.Channel, v.Data)
+
+		case redis.Subscription:
+			fmt.Printf("--------->%s: %s %d\n", v.Channel, v.Kind, v.Count)
+		case error:
+			fmt.Println("~~~~~Error", conn.Err())
+			time.Sleep(time.Second * 10)
+		}
+	}
+	// }(conn)
 
 }
