@@ -1,6 +1,7 @@
 package main
 
 import (
+	"dragon-fruit/app/business"
 	"dragon-fruit/app/global"
 	"dragon-fruit/app/global/helper"
 	"dragon-fruit/app/handler/test"
@@ -32,6 +33,10 @@ func init() {
 
 	// 檢查 Redis 機器服務
 	repository.RedisPing()
+
+	// 啟動 redis Sub 監聽
+	bus := business.RedisIns()
+	go bus.RedisSub()
 
 	// 設定程式碼 timezone
 	os.Setenv("TZ", "America/Puerto_Rico")
@@ -94,7 +99,7 @@ func runHTTP() {
 
 	// 載入router設定
 	router.RouteProvider(r)
-	r.Run()
+	r.Run(":8080")
 
 	// 若有遇到需直接刪除 Pod 情形，為讓服務能 graceful-shutdown，可啟用以下代碼並將『r.Run(":8080")』註解即可
 	//　https://github.com/gin-gonic/examples/blob/master/graceful-shutdown/graceful-shutdown/server.go

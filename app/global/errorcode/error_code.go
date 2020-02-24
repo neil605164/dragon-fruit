@@ -38,6 +38,11 @@ var errorCode = map[int]string{
 	1001034: "DB TABLE NOT EXIST",                 // 資料庫表不存在
 
 	/** 色碟 [1002XXX] **/
-	1002001: "BIND_PARAMS_FAI",                 // 帶入參數格式錯誤
-	1002002: "VAILDATE_PARAMS_FAIL",                 // 帶入參數驗證失敗
+	1002001: "BIND_PARAMS_FAI",      // 帶入參數格式錯誤
+	1002002: "VAILDATE_PARAMS_FAIL", // 帶入參數驗證失敗
+
+	/** Redis 錯誤 [1003XXX] **/
+	1003001: "REDIS PUBLISH ERROR",           // Redis publish 失敗
+	1003002: "REDIS SUBSCRIBE CONNECT ERROR", // Redis subscribe connect 失敗
+	1003003: "REDIS SUBSCRIBE CONNECT ERROR", // Redis subscribe connect 失敗
 }
