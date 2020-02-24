@@ -10,9 +10,9 @@ type xocdiaBetting struct {
 
 type xocdiaBettingRes struct {
 	// 開獎結果(紅白顆數)
-	Draw   xocdiaBettingResDraw     `json:"draw"`
+	Draw xocdiaBettingResDraw `json:"draw"`
 	// 盤面組合(六種組合)
-	BetRes map[int]bool             `json:"bet_res"`
+	BetRes []int `json:"bet_res" example:"2,4"`
 	// 下注結果
 	AllBet []xocdiaBettingResAllBet `json:"bet"`
 }

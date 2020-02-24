@@ -37,26 +37,32 @@ func (*Business) Betting(req []structs.Xocdia) (resp structs.XocdiaResp) {
 	// 雙 (代號1)
 	if result["white"] == 4 || result["red"] == 4 || result["white"] == 2 || result["red"] == 2 {
 		betRes[1] = true
+		resp.BetRes = append(resp.BetRes, 1)
 	}
 	// 單 (代號2)
 	if result["white"] == 3 || result["red"] == 3 {
 		betRes[2] = true
+		resp.BetRes = append(resp.BetRes, 2)
 	}
 	// 紅4 (代號3)
 	if result["red"] == 4 {
 		betRes[3] = true
+		resp.BetRes = append(resp.BetRes, 3)
 	}
 	// 紅3 (代號4)
 	if result["red"] == 3 {
 		betRes[4] = true
+		resp.BetRes = append(resp.BetRes, 4)
 	}
 	// 白4 (代號5)
 	if result["white"] == 4 {
 		betRes[5] = true
+		resp.BetRes = append(resp.BetRes, 5)
 	}
 	// 白3 (代號6)
 	if result["white"] == 3 {
 		betRes[6] = true
+		resp.BetRes = append(resp.BetRes, 6)
 	}
 
 	// 賠率假資料
@@ -71,7 +77,6 @@ func (*Business) Betting(req []structs.Xocdia) (resp structs.XocdiaResp) {
 
 	// 組回傳資訊
 	resp.Draw = result
-	resp.BetRes = betRes
 
 	// 計算回傳贏分資訊
 	for _, v := range req {

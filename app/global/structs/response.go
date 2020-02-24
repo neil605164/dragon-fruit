@@ -5,7 +5,7 @@ type XocdiaResp struct {
 	// 開獎結果(紅白顆數)
 	Draw map[string]int `json:"draw"`
 	// 盤面組合(六種組合)
-	BetRes map[int]bool `json:"bet_res"`
+	BetRes []int `json:"bet_res"`
 	// 下注結果
 	AllBet []XocdiaRespRes `json:"all_bet"`
 }
