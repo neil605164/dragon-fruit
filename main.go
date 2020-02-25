@@ -6,6 +6,7 @@ import (
 	"dragon-fruit/app/global/helper"
 	"dragon-fruit/app/model"
 	"dragon-fruit/app/repository"
+	_ "dragon-fruit/docs"
 	"dragon-fruit/router"
 	"fmt"
 	"os"
