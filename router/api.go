@@ -1,6 +1,7 @@
 package router
 
 import (
+	"dragon-fruit/app/handler/wsh"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -12,8 +13,7 @@ import (
 func LoadBackendRouter(r *gin.Engine) {
 	api := r.Group("/api")
 	{
-		// api.GET("/ws", ws.Wshandler())
-		// api.GET("/ws", test.ServeWs())
+		api.GET("/ws", wsh.ServeWs())
 
 		// 載入測試用API
 		if os.Getenv("ENV") == "develop" || os.Getenv("ENV") == "local" {

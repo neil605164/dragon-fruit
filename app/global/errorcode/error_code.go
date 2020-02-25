@@ -44,4 +44,5 @@ var errorCode = map[int]string{
 
 	/** WebSocket 錯誤 [1004XXX] **/
 	1004001: "WEBSOCKET CONNECT ERROR", // Websocket Connect Error
+	1004002: "TOKEN NOT EXIST",         // Token not exist
 }

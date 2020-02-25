@@ -4,7 +4,6 @@ import (
 	"dragon-fruit/app/business"
 	"dragon-fruit/app/global"
 	"dragon-fruit/app/global/helper"
-	"dragon-fruit/app/handler/test"
 	"dragon-fruit/app/model"
 	"dragon-fruit/app/repository"
 	"dragon-fruit/router"
@@ -91,10 +90,6 @@ func runHTTP() {
 
 	// 背景
 	// go task.Schedule()
-
-	// New WebSocket
-	hub := test.NewHub()
-	go hub.Run()
 
 	// 載入router設定
 	router.RouteProvider(r)
