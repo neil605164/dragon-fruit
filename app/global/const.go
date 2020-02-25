@@ -43,3 +43,8 @@ const (
 const (
 	TimeOut = 10 // 連api 10 秒timeout
 )
+
+/** Redis 通道名稱 **/
+const (
+	Channel = "boardcast"
+)

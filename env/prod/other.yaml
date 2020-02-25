@@ -1,7 +1,7 @@
 log:
   log_dir: /app/log/
-  access_log: goformat_access.log
-  error_log: goformat_error.log
+  access_log: dragon-fruit_access.log
+  error_log: dragon-fruit_error.log
 
 db:
   debug: false

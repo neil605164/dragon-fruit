@@ -1,7 +1,6 @@
 package test
 
 import (
-	"dragon-fruit/app/business"
 	"log"
 	"net/http"
 	"time"
@@ -38,14 +37,26 @@ func ServeWs(hub *Hub, c *gin.Context) {
 	go client.writePump()
 }
 
-// RedisPub redis sub
-func RedisPub(c *gin.Context) {
-	bus := business.RedisIns()
-	bus.RedisPub()
-}
+// func ServeWs() gin.HandlerFunc {
 
-// RedisSub redis sub
-func RedisSub(c *gin.Context) {
-	bus := business.RedisIns()
-	bus.RedisSub()
-}
+// 	hub := NewHub()
+// 	go hub.Run()
+
+// 	return func(c *gin.Context) {
+// 		conn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
+// 		// defer conn.Close()
+// 		if err != nil {
+// 			log.Println(err)
+// 			return
+// 		}
+
+// 		token := c.Query("token")
+// 		fmt.Println(token)
+
+// 		client := &Client{id: token, hub: hub, conn: conn, send: make(chan []byte, 256)}
+// 		client.hub.register <- client
+
+// 		go client.readPump()
+// 		go client.writePump()
+// 	}
+// }

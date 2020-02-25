@@ -193,13 +193,13 @@ func (rConn *Redis) HashGet(hkey string, field interface{}) (value string, apiEr
 }
 
 // Publish redis pub
-func (rConn *Redis) Publish(key string, value string) (reply int, apiErr errorcode.Error) {
+func (rConn *Redis) Publish(channel string, data string) (reply int, apiErr errorcode.Error) {
 	var err error
 
 	conn := redisPool.Get()
 	defer conn.Close()
 
-	reply, err = redis.Int(conn.Do("PUBLISH", key, value))
+	reply, err = redis.Int(conn.Do("PUBLISH", channel, data))
 	if err != nil {
 		helper.ErrorHandle(global.WarnLog, 1003001, err.Error())
 		return
@@ -212,59 +212,21 @@ func (rConn *Redis) Publish(key string, value string) (reply int, apiErr errorco
 func (rConn *Redis) Subscribe(channel string, msg chan []byte) {
 
 	conn := redisPool.Get()
-	// defer conn.Close()
+	defer conn.Close()
 
 	psc := redis.PubSubConn{Conn: conn}
 
 	if err := psc.PSubscribe(channel); err != nil {
-		fmt.Println("Subscribe Error ====>", err.Error())
+		helper.ErrorHandle(global.WarnLog, 1003002, err.Error())
 	}
 
-	// Start a goroutine to receive notifications from the server.
-	// go func(conn redis.Conn) {
-	defer conn.Close()
 	for {
 		switch v := psc.Receive().(type) {
 		case redis.Message:
-			fmt.Printf("========>%s: message: %s\n", v.Channel, v.Data)
 			msg <- v.Data
-		case redis.Subscription:
-			fmt.Printf("--------->%s: %s %d\n", v.Channel, v.Kind, v.Count)
 		case error:
-			fmt.Println("~~~~~Error", conn.Err())
-			time.Sleep(time.Second * 10)
+			helper.ErrorHandle(global.WarnLog, 1003003, conn.Err())
 		}
 	}
-	// }(conn)
-
-}
-
-func Subscribe2() {
-
-	conn := redisPool.Get()
-	// defer conn.Close()
-
-	psc := redis.PubSubConn{Conn: conn}
-
-	if err := psc.PSubscribe("test/foo"); err != nil {
-		fmt.Println("Subscribe Error ====>", err.Error())
-	}
-
-	// Start a goroutine to receive notifications from the server.
-	// go func(conn redis.Conn) {
-	defer conn.Close()
-	for {
-		switch v := psc.Receive().(type) {
-		case redis.Message:
-			fmt.Printf("========>%s: message: %s\n", v.Channel, v.Data)
-
-		case redis.Subscription:
-			fmt.Printf("--------->%s: %s %d\n", v.Channel, v.Kind, v.Count)
-		case error:
-			fmt.Println("~~~~~Error", conn.Err())
-			time.Sleep(time.Second * 10)
-		}
-	}
-	// }(conn)
 
 }

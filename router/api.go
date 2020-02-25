@@ -1,7 +1,6 @@
 package router
 
 import (
-	"dragon-fruit/app/handler/test"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -13,14 +12,14 @@ import (
 func LoadBackendRouter(r *gin.Engine) {
 	api := r.Group("/api")
 	{
+		// api.GET("/ws", ws.Wshandler())
+		// api.GET("/ws", test.ServeWs())
+
 		// 載入測試用API
 		if os.Getenv("ENV") == "develop" || os.Getenv("ENV") == "local" {
 
 			// Swagger
 			api.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 		}
-
-		api.GET("/redis-pub", test.RedisPub)
-		api.GET("/redis-sub", test.RedisSub)
 	}
 }
