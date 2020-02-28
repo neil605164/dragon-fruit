@@ -2,6 +2,7 @@ package router
 
 import (
 	"dragon-fruit/app/middleware"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,6 +16,10 @@ func RouteProvider(r *gin.Engine) {
 
 	r.GET("/", func(c *gin.Context) {
 		c.HTML(200, "index.html", nil)
+	})
+
+	r.GET("/hello", func(c *gin.Context) {
+		c.JSON(http.StatusOK, "Hello")
 	})
 
 	// api route
