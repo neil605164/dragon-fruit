@@ -37,16 +37,19 @@ var errorCode = map[int]string{
 	1001033: "PUT METHOD API STATUS ERROR",        // 對外連線回傳code異常
 	1001034: "DB TABLE NOT EXIST",                 // 資料庫表不存在
 
-	/** 色碟 [1002XXX] **/
-	1002001: "BIND_PARAMS_FAI",      // 帶入參數格式錯誤
-	1002002: "VAILDATE_PARAMS_FAIL", // 帶入參數驗證失敗
+	/** 行為判斷 [1002XXX] **/
+	1002001: "WS ACTION JSON UNMARSHAL ERROR", // 判斷預執行行為錯誤(json unmarshal)
 
 	/** Redis 錯誤 [1003XXX] **/
 	1003001: "REDIS PUBLISH ERROR",           // Redis publish 失敗
 	1003002: "REDIS SUBSCRIBE CONNECT ERROR", // Redis subscribe connect 失敗
-	1003003: "REDIS SUBSCRIBE Receive ERROR", // Redis subscribe receive 失敗
+	1003003: "REDIS SUBSCRIBE RECIEVE ERROR", // Redis subscribe receive 失敗
 
 	/** WebSocket 錯誤 [1004XXX] **/
-	1004001: "WEBSOCKET CONNECT ERROR", // Websocket Connect Error
-	1004002: "TOKEN NOT EXIST",         // Token not exist
+	1004001: "WEBSOCKET CONNECT ERROR",       // Websocket 建立連線失敗
+	1004002: "TOKEN NOT EXIST",               // Token 不存在
+	1004003: "WEBSOCKET READ MESSAGE ERROR",  // 讀 websocket 訊息錯誤
+	1004004: "WEBSOCKET WRITE MESSAGE ERROR", // 回傳 websocket 訊息錯誤
+	1004005: "WEBSOCKET HEALTHCHECK ERROR",   // websocket healthcheck 錯誤
+
 }

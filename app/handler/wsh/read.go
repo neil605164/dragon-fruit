@@ -1,10 +1,10 @@
 package wsh
 
 import (
+	"dragon-fruit/app/business"
 	"dragon-fruit/app/global"
 	"dragon-fruit/app/global/helper"
 	"dragon-fruit/app/global/ws"
-	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -29,14 +29,21 @@ func ServeWs() gin.HandlerFunc {
 		},
 	}
 
+	// 啟動 redis Sub 監聽
+	bus := business.RedisIns()
+	go bus.RedisSub()
+
 	return func(c *gin.Context) {
+
+		// token 驗證
 		token := strings.TrimSpace(c.Query("token"))
 		if token == "" {
 			apiErr := helper.ErrorHandle(global.WarnLog, 1004002, "TOKEN NOT EXIST", token)
 			c.JSON(http.StatusOK, helper.Fail(apiErr))
 			return
 		}
-		fmt.Println(token)
+
+		// todo 驗證 token
 
 		conn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
 		if err != nil {

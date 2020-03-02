@@ -1,7 +1,6 @@
 package main
 
 import (
-	"dragon-fruit/app/business"
 	"dragon-fruit/app/global"
 	"dragon-fruit/app/global/helper"
 	"dragon-fruit/app/model"
@@ -32,10 +31,6 @@ func init() {
 
 	// 檢查 Redis 機器服務
 	repository.RedisPing()
-
-	// 啟動 redis Sub 監聽
-	bus := business.RedisIns()
-	go bus.RedisSub()
 
 	// 設定程式碼 timezone
 	os.Setenv("TZ", "America/Puerto_Rico")

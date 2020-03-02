@@ -2,8 +2,9 @@ package ws
 
 import (
 	"bytes"
-	"fmt"
-	"log"
+	"dragon-fruit/app/business/gameb"
+	"dragon-fruit/app/global"
+	"dragon-fruit/app/global/helper"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -28,11 +29,6 @@ var (
 	space   = []byte{' '}
 )
 
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-}
-
 // Client is a middleman between the websocket connection and the hub.
 type Client struct {
 	Hub *Hub
@@ -56,18 +52,25 @@ func (c *Client) ReadPump() {
 		c.Hub.Unregister <- c
 		c.Conn.Close()
 	}()
+
 	c.Conn.SetReadLimit(maxMessageSize)
 	c.Conn.SetReadDeadline(time.Now().Add(pongWait))
 	c.Conn.SetPongHandler(func(string) error { c.Conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
+
 	for {
 		_, message, err := c.Conn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Printf("error: %v", err)
+				helper.ErrorHandle(global.WarnLog, 1004003, err.Error())
 			}
 			break
 		}
-		fmt.Println(message)
+
+		// todo
+		bus := gameb.Instance()
+		bus.EnterGame(c.ID, message)
+
+		// 模擬推播
 		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
 		c.Hub.Broadcast <- message
 
@@ -104,6 +107,7 @@ func (c *Client) WritePump() {
 
 			w, err := c.Conn.NextWriter(websocket.TextMessage)
 			if err != nil {
+				helper.ErrorHandle(global.WarnLog, 1004004, err.Error())
 				return
 			}
 			w.Write(message)
@@ -121,6 +125,7 @@ func (c *Client) WritePump() {
 		case <-ticker.C:
 			c.Conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if err := c.Conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+				helper.ErrorHandle(global.WarnLog, 1004005, err.Error())
 				return
 			}
 		}
