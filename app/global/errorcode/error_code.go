@@ -37,7 +37,7 @@ var errorCode = map[int]string{
 	1001033: "PUT METHOD API STATUS ERROR",        // 對外連線回傳code異常
 	1001034: "DB TABLE NOT EXIST",                 // 資料庫表不存在
 
-	/** 行為判斷 [1002XXX] **/
+	/** 色碟錯誤 [1002XXX] **/
 	1002001: "WS ACTION JSON UNMARSHAL ERROR", // 判斷預執行行為錯誤(json unmarshal)
 
 	/** Redis 錯誤 [1003XXX] **/

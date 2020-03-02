@@ -2,7 +2,7 @@ package ws
 
 import (
 	"bytes"
-	"dragon-fruit/app/business/gameb"
+	"dragon-fruit/app/business"
 	"dragon-fruit/app/global"
 	"dragon-fruit/app/global/helper"
 	"time"
@@ -67,7 +67,9 @@ func (c *Client) ReadPump() {
 		}
 
 		// todo
-		bus := gameb.Instance()
+		// bus := gameb.Instance()
+		// bus.EnterGame(c.ID, message)
+		bus := business.NewGame(c.ID)
 		bus.EnterGame(c.ID, message)
 
 		// 模擬推播
