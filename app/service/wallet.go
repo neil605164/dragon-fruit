@@ -21,8 +21,14 @@ func WaIns() *WalletSer {
 }
 
 // GetBalance 取餘額
-func (w *WalletSer) GetBalance(token string) (balance int, apiErr errorcode.Error) {
+func (w *WalletSer) GetBalance(token string) (balance float64, apiErr errorcode.Error) {
 
-	balance = 100
+	balance = 100.0
+	return
+}
+
+// Deduction 扣款
+func (w *WalletSer) Deduction(amount float64, userID string) (apiErr errorcode.Error) {
+
 	return
 }

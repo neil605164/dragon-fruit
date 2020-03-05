@@ -35,7 +35,7 @@ func ServeWs() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 
-		// token 驗證
+		// 取 token
 		token := strings.TrimSpace(c.Query("token"))
 		if token == "" {
 			apiErr := helper.ErrorHandle(global.WarnLog, 1004002, "TOKEN NOT EXIST", token)
@@ -43,7 +43,10 @@ func ServeWs() gin.HandlerFunc {
 			return
 		}
 
-		// todo 驗證 token
+		// todo 驗證 + 解析 token
+		userID := "use01"
+		parentID := "parent01"
+		gameID := "1"
 
 		conn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
 		if err != nil {
@@ -52,7 +55,15 @@ func ServeWs() gin.HandlerFunc {
 			return
 		}
 
-		client := &ws.Client{ID: token, Hub: hub, Conn: conn, Send: make(chan []byte, 256)}
+		client := &ws.Client{
+			UID:    userID,
+			PID:    parentID,
+			Token:  token,
+			GameID: gameID,
+			Hub:    hub, Conn: conn,
+			Send: make(chan []byte, 256)
+		}
+
 		client.Hub.Register <- client
 
 		go client.ReadPump()

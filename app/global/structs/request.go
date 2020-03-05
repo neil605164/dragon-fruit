@@ -7,6 +7,6 @@ type WsAction struct {
 
 // BetGame 遊戲下注
 type BetGame struct {
-	BetAmount float64 `json:"bet_amount"`
-	BetResult string  `json:"bet_result"`
+	Project uint8   `json:"project"`
+	Mount   float64 `json:"mount"`
 }

@@ -5,6 +5,8 @@ import (
 	"dragon-fruit/app/business"
 	"dragon-fruit/app/global"
 	"dragon-fruit/app/global/helper"
+	"dragon-fruit/app/global/structs"
+	"encoding/json"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -33,7 +35,13 @@ var (
 type Client struct {
 	Hub *Hub
 
-	ID string
+	UID string
+
+	PID string
+
+	Token string
+
+	GameID string
 
 	// The websocket connection.
 	Conn *websocket.Conn
@@ -69,8 +77,13 @@ func (c *Client) ReadPump() {
 		// todo
 		// bus := gameb.Instance()
 		// bus.EnterGame(c.ID, message)
-		bus := business.NewGame(c.ID)
-		bus.EnterGame(c.ID, message)
+
+		ws := &structs.WsClient{}
+		byteData, _ := json.Marshal(c)
+		json.Unmarshal(byteData, ws)
+
+		bus := business.NewGame(ws.GameID)
+		bus.EnterGame(ws, message)
 
 		// 模擬推播
 		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))

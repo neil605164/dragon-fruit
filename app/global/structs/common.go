@@ -1,5 +1,7 @@
 package structs
 
+import "github.com/gorilla/websocket"
+
 // EnvConfig dev.yaml格式
 type EnvConfig struct {
 	DBMaster    DbMaster    `yaml:"master"`
@@ -64,4 +66,30 @@ type APIResult struct {
 type GrpcSetting struct {
 	Name string `yaml:"name"`
 	Path string `yaml:"path"`
+}
+
+// WsClient Websocket Client Info
+type WsClient struct {
+	Hub    *Hub           // ws 行為
+	UID    string         // 用戶
+	PID    string         // 代理
+	Token  string         // 憑證
+	GameID string         // 遊戲 ID
+	Conn   websocket.Conn // ws 連線
+	Send   chan []byte    // 訊息
+}
+
+// Hub maintains the set of active clients and broadcasts messages to the client
+type Hub struct {
+	Singal     chan SingalMsg       // Registered clients.
+	Broadcast  chan []byte          // Inbound messages from the clients.
+	Register   chan *WsClient       // Register requests from the clients.
+	Unregister chan *WsClient       // Unregister requests from clients.
+	List       map[string]*WsClient // Unregister requests from clients.
+}
+
+// SingalMsg 個人訊息
+type SingalMsg struct {
+	uuid string
+	msg  []byte
 }

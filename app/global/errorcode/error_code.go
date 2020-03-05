@@ -38,7 +38,9 @@ var errorCode = map[int]string{
 	1001034: "DB TABLE NOT EXIST",                 // 資料庫表不存在
 
 	/** 色碟錯誤 [1002XXX] **/
-	1002001: "WS ACTION JSON UNMARSHAL ERROR", // 判斷預執行行為錯誤(json unmarshal)
+	1002001: "ACTION JSON UNMARSHAL ERROR",     // 判斷預執行行為錯誤(json unmarshal)
+	1002002: "BET RESULT JSON UNMARSHAL ERROR", // 取下注紀錄行為錯誤(json unmarshal)
+	1002003: "BALANCE NOT ENOUGH TO BET",       // 餘額不足無法下注
 
 	/** Redis 錯誤 [1003XXX] **/
 	1003001: "REDIS PUBLISH ERROR",           // Redis publish 失敗
